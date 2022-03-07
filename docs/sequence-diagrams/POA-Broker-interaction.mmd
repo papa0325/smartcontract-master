@@ -1,0 +1,18 @@
+sequenceDiagram
+  participant Issuer
+  participant PMR as PoaManager
+  participant POA as PoaToken
+
+  Note over Issuer,POA: Precondition: Issuer has been added to PoaManager
+  Note over Issuer,POA: Precondition: Issuer is in active status
+
+  alt Issuer lists a new POA
+    Issuer->>+PMR: addNewToken(...)
+  end
+
+  Note over Issuer,POA: PoaToken is successfully funded and Custodian activates the contract
+
+  alt Issuer claims the ETH from successful funding
+    Issuer->>+POA: claim()
+    POA->>Issuer: transfer all ETH from funding
+  end

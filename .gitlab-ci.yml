@@ -1,0 +1,77 @@
+image: node:10
+cache:
+  key: $CI_BUILD_REF_SLUG
+  paths:
+    - node_modules/
+
+stages:
+  - setup
+  - test
+  - build
+  - release
+  - deploy
+
+#########
+# SETUP #
+#########
+setup:
+  stage: setup
+  script:
+    - yarn install --frozen-lockfile
+  artifacts:
+    paths:
+      - node_modules/
+
+########
+# TEST #
+########
+lint:
+  stage: test
+  cache:
+    policy: pull
+  script:
+    - yarn lint
+
+test:
+  stage: test
+  cache:
+    policy: pull
+  script:
+    - cp .env.example .env
+    - yarn test
+
+#########
+# BUILD #
+#########
+build_image:
+  stage: build
+  image: docker:latest
+  variables:
+    DOCKER_DRIVER: overlay2
+  services:
+    - docker:dind
+  script:
+    - docker login --username gitlab-ci-token --password $CI_BUILD_TOKEN $CI_REGISTRY
+    # if the branch is master, use the latest tag. When the repository is tagged (git tag), the docker image tag should reflect that.
+    - '[ "$CI_COMMIT_REF_SLUG" == "master" ] && CI_COMMIT_REF_SLUG=latest'
+    - docker build --network host --cache-from $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG --tag $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  only:
+    - master
+  except:
+    - tags
+  # skip artifacts and cache download for this job
+  dependencies: []
+  cache: {}
+
+###############
+# NPM RELEASE #
+###############
+release:
+  stage: release
+  cache:
+    policy: pull
+  only:
+    - master
+  script:
+    - /bin/sh $(pwd)/scripts/ci-release.sh

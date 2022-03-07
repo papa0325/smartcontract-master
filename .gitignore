@@ -1,0 +1,40 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# dependencies
+node_modules
+package-lock.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# testing
+coverage
+coverage.json
+
+# production
+build
+deployed-contracts
+
+# misc
+.DS_Store
+.env
+.node-xmlhttprequest*
+
+# tmp files
+~*
+.#*
+.editorconfig
+
+# Local geth folders
+private-chain-data/geth
+private-chain-data/history
+
+# Local Settings
+.vscode
+
+# generated diagrams
+sequence-diagrams/*.svg

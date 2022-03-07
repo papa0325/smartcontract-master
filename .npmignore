@@ -1,0 +1,13 @@
+# ignoring everything and then whitelist what to include
+*
+
+# built contract artifacts, and minimal contract for downstream consumers
+!deployed-contracts/*.json
+!build/contracts/*.json
+
+# migration helpers used to deploy contracts in e2e testing in platform
+!config/*
+!helpers/*
+!migrations/helpers/*
+!scripts/lib/*
+!truffle.js
